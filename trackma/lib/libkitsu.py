@@ -52,20 +52,7 @@ class libkitsu(lib):
         'version': 'v0.3',
         'merge': True
     }
-    status_translate = {
-        'tba': utils.STATUS_UNKNOWN,
-        'finished': utils.STATUS_FINISHED,
-        'current': utils.STATUS_AIRING,
-        'upcoming': utils.STATUS_NOTYET,
-        'unreleased': utils.STATUS_NOTYET
-    }
-    type_translate = {
-        'ONA': utils.TYPE_OVA,
-        'OVA': utils.TYPE_OVA,
-        'TV': utils.TYPE_SP,
-        'movie': utils.TYPE_MOVIE,
-        'music': utils.TYPE_OTHER
-    }
+
     default_mediatype = 'anime'
     default_statuses = ['current', 'completed',
                         'on_hold', 'dropped', 'planned']
@@ -131,6 +118,10 @@ class libkitsu(lib):
     # TODO : These values are previsional.
     _client_id = 'dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd'
     _client_secret = '54d7307928f63414defd96399fc31ba847961ceaecef3a5fd93144e960c0e151'
+
+    status_translate = {'Currently Airing': utils.Status.AIRING,
+                        'Finished Airing': utils.Status.FINISHED,
+                        'Not Yet Aired': utils.Status.NOTYET}
 
     def __init__(self, messenger, account, userconfig):
         """Initializes the useragent through credentials."""
@@ -514,16 +505,16 @@ class libkitsu(lib):
         now = datetime.datetime.now()
 
         if end_date and end_date < now:
-            return utils.STATUS_FINISHED
+            return utils.Status.FINISHED
 
         if start_date:
             if start_date > now:
-                return utils.STATUS_NOTYET
+                return utils.Status.NOTYET
             else:
-                return utils.STATUS_AIRING
+                return utils.Status.AIRING
 
         # Safe to assume dates haven't even been announced yet
-        return utils.STATUS_NOTYET
+        return utils.Status.NOTYET
 
     def _parse_info(self, media):
         info = utils.show()
@@ -549,12 +540,10 @@ class libkitsu(lib):
             'image_thumb': attr['posterImage'] and attr['posterImage']['tiny'],
             'start_date':  self._str2date(attr['startDate']),
             'end_date':    self._str2date(attr['endDate']),
-            'type':        self.type_translate.get(attr['subtype'],utils.TYPE_UNKNOWN),
-            'status':      self.status_translate.get(attr['status'],utils.STATUS_UNKNOWN),
             'url': "https://kitsu.io/{}/{}".format(self.mediatype, attr['slug']),
             'aliases':     list(filter(None, attr['titles'].values())),
             'extra': [
-                ('Synopsis', attr['description']),
+                ('Synopsis', attr['synopsis']),
                 ('Type',     attr['subtype']),
                 ('Titles',  list(filter(None, attr['titles'].values())) ),
                 ('Average Rating', attr['averageRating'] or '?'),
