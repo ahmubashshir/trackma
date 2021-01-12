@@ -282,7 +282,8 @@ class libkitsu(lib):
                     'slug',
                     'canonicalTitle',
                     'titles',
-                    'episodeCount' if self.mediatype in ['anime','drama'] else 'chapterCount',
+                    'episodeCount' if self.mediatype in [
+                        'anime', 'drama'] else 'chapterCount',
                     'description',
                     'status',
                     'nsfw',
@@ -544,9 +545,9 @@ class libkitsu(lib):
             'url': "https://kitsu.io/{}/{}".format(self.mediatype, attr['slug']),
             'aliases':     list(filter(None, attr['titles'].values())),
             'extra': [
-                ('Synopsis', attr['synopsis']),
+                ('Synopsis', attr['description']),
                 ('Type',     attr['subtype']),
-                ('Titles',  list(filter(None, attr['titles'].values())) ),
+                ('Titles',  list(filter(None, attr['titles'].values()))),
                 ('Average Rating', attr['averageRating'] or '?'),
                 ('Popularity Rank', attr['popularityRank']),
                 ('Rating Rank', attr['ratingRank']),
